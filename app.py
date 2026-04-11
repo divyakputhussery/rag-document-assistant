@@ -1,4 +1,7 @@
 import os
+import tempfile
+
+import streamlit as st
 from dotenv import load_dotenv
 
 from src.loader import load_pdf
@@ -9,39 +12,41 @@ from src.qa_chain import answer_question
 
 load_dotenv()
 
+st.set_page_config(page_title="RAG Document Assistant", layout="wide")
 
-def main():
-    pdf_path = "data/sample.pdf"
+st.title("RAG Document Assistant")
+st.write("Upload a PDF and ask questions about its content.")
 
-    print("Loading PDF...")
-    documents = load_pdf(pdf_path)
-    print(f"Loaded {len(documents)} pages.")
+uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
 
-    print("\nSplitting document into chunks...")
-    chunks = split_documents(documents)
-    print(f"Created {len(chunks)} chunks.")
+if uploaded_file is not None:
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp_file:
+        tmp_file.write(uploaded_file.read())
+        temp_pdf_path = tmp_file.name
 
-    print("\nCreating vector store...")
-    vector_store = create_vector_store(chunks)
+    try:
+        with st.spinner("Processing PDF and building vector store..."):
+            documents = load_pdf(temp_pdf_path)
+            chunks = split_documents(documents)
+            vector_store = create_vector_store(chunks)
+            retriever = get_retriever(vector_store)
 
-    print("Creating retriever...")
-    retriever = get_retriever(vector_store)
+        st.success("PDF processed successfully.")
 
-    print("\nRAG system ready 🚀")
+        question = st.text_input("Enter your question")
 
-    question = input("\nEnter your question: ").strip()
+        if question.strip():
+            with st.spinner("Finding answer..."):
+                answer, sources = answer_question(retriever, question)
 
-    answer, sources = answer_question(retriever, question)
+            st.subheader("Answer")
+            st.write(answer)
 
-    print("\nAnswer:\n")
-    print(answer)
+            st.subheader("Source Chunks")
+            for i, doc in enumerate(sources, start=1):
+                with st.expander(f"Source {i}"):
+                    st.write(doc.page_content)
 
-    print("\nSource chunks:\n")
-    for i, doc in enumerate(sources, start=1):
-        print(f"Source {i}:")
-        print(doc.page_content[:300])
-        print("-" * 60)
-
-
-if __name__ == "__main__":
-    main()
+    finally:
+        if os.path.exists(temp_pdf_path):
+            os.remove(temp_pdf_path)
