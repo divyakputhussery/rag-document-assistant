@@ -1,5 +1,11 @@
+import os
+from dotenv import load_dotenv
+
 from src.loader import load_pdf
 from src.chunker import split_documents
+from src.embedder import create_vector_store
+
+load_dotenv()  # 🔥 THIS WAS MISSING
 
 
 def main():
@@ -13,8 +19,10 @@ def main():
     chunks = split_documents(documents)
     print(f"Created {len(chunks)} chunks.")
 
-    print("\nFirst chunk preview:\n")
-    print(chunks[0].page_content[:500])
+    print("\nCreating vector store...")
+    vector_store = create_vector_store(chunks)
+
+    print("Vector store created successfully!")
 
 
 if __name__ == "__main__":
