@@ -11,7 +11,7 @@ from src.retriever import get_retriever
 from src.qa_chain import answer_question
 
 load_dotenv()
-
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or st.secrets["OPENAI_API_KEY"]
 st.set_page_config(page_title="RAG Document Assistant", layout="wide")
 
 st.title("RAG Document Assistant")
