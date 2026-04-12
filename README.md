@@ -50,7 +50,7 @@ docker run -p 8501:8501 rag-app
 
 ## 🌐 Live Demo
 
-(Add your deployed link here)
+[RAG Document Assistant](https://rag-document-assistant-dysnwr4pxpnxsuv2pcpbpe.streamlit.app/)
 
 ---
 
