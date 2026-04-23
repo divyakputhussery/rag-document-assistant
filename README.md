@@ -48,10 +48,5 @@ docker run -p 8501:8501 rag-app
 
 ---
 
-## 🌐 Live Demo
-
-[RAG Document Assistant](https://rag-document-assistant-dysnwr4pxpnxsuv2pcpbpe.streamlit.app/)
-
----
 
 Built as part of hands-on exploration in AI, Cloud, and Automation.
